@@ -32,8 +32,6 @@
 npm start
 ```
 
-
-
 ### 引入
 
 `require()`
@@ -56,14 +54,14 @@ require("./demo")//.js可以不用写
 module.exports=10//导出的数据
 ```
 
-一个模块可以**导入多个**
-但一个模块只能**导出一个**
+一个模块可以**导入多个** 
+但一个模块只能**导出一个** 
 
 如果导入的模块没有导出数据,**默认导出的是空对象**
-而这个默认的值是`module.exports`
+而这个默认的值是`module.exports` 
 
 而`exports`和`module.exports`是**引用**关系
-也就是`module.exports`**赋值**给了`exports`
+也就是`module.exports`**赋值**给了`exports` 
 
 ```js
 //默认程序
@@ -133,6 +131,29 @@ path.relative("a","b")//从a路径到b路径怎么走
 path.parse("c:/a/b/c/1.txt")//根是c:/文件类型text
 ```
 
+#### `basename` 读取文件名
+
+传入两个参数一个是文件的路径 一个是文件后缀(可选)
+
+```js
+path.basename('./01text.txt')//返回 01text.txt
+path.basename('./01text.txt','txt')//返回 01text
+```
+
+
+
+### `http` 启动服务
+
+```js
+let http = require('http')
+let server = http.createServer((req,res)=>{
+    res.writeHead(200,{'Contetn-type':'text/html;charset=UTF-8'})
+    res.write('<h1>Hellow</h1>')//写入
+    res.end('hellow')//结束
+})
+server.listen(3000,'localhost')//监听端口
+```
+
 
 
 ### `global`全局变量
@@ -163,8 +184,12 @@ new URL("https://www.baidu.com")
 #### `parse`查询字符处理成对象属性
 
 ```js
+let querystring = require('querystring')
 querystring.parse("a=2&b=1&c=7")//以对象形式展现出来
 //{a:2,b:1,c:7}
+//第二个参数是以什么分割
+//第三个是链接符
+//第四个 对象 maxKeys分析几个参数
 ```
 
 #### `stringify`将对象转化为查询字符
@@ -182,6 +207,10 @@ querystring.stringify({name:"123",age:12},":",";")//name;123:age;18
 
 第二个是分隔符
 第三个是链接符
+
+#### `escape` 将字符串进行编码
+
+#### `unescape` 将字符串进行解码
 
 ### `fs`文件系统
 
@@ -251,7 +280,7 @@ try{
 
 ```js
 let fs = require("fs")
-fs.writeFile("地址","内容",{},(err)=>{})
+fs.writeFile("地址","内容",{},(err,w)=>{}) // w 是总共的字节数
 ```
 
 第一个参数是文件路径
@@ -574,7 +603,7 @@ app.listen(2333);
 
 ### 处理请求
 
-创建路由
+#### 创建路由
 
 跟路由是一个斜杠/
 
@@ -590,6 +619,12 @@ app.get("/",()=>{})//监听根
 app.get("/goudan",()=>{})
 ````
 
+路由可以写正则
+
+```js
+app.get(/^\/student\/([\d]{5})$/)
+```
+
 回调函数里面有两个参数
 
 `request , response`
@@ -598,6 +633,14 @@ app.get("/goudan",()=>{})
 
 ```js
 res.send("我给你返回了");//返回文字
+```
+
+`send` 固定返回304状态码
+
+#### 自定义状态码`status` 
+
+```js
+res.status(404).send('找不到页面')
 ```
 
 #### `sendFile`返回文件
@@ -624,8 +667,6 @@ app.post("data",()=>{})
 }
 ```
 
-
-
 ### 中间件
 
 帮助处理接受的信息
@@ -642,7 +683,7 @@ app.use((req,res)=>{})//里面的req和res和app.get里面的一样
 
 #### next
 
-app.use写在请求的上面他需要运行next才会进行下一个中间件
+`app.use`写在请求的上面他需要运行next才会进行下一个中间件
 
 ```js
 const app = experss()
@@ -655,7 +696,7 @@ app.use((req,res,next)=>{
 **不能给前端send多次**
 如果一个路由经过多个中间件,那么前面的中间件必须有next才会进入下一个中间件
 
-#### 处理
+#### 处理前端传来的参数
 
 中间件就是处理前端传来的参数
 
@@ -664,9 +705,13 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));//写好了next
 ```
 
-##### req.query  get接受处理好的参数
+`post` 传来的参数因为安全性不能直接获取,需要中间件
 
-post 接受处理好的请求req.body
+如果不想写就用`req.params`接受`get`参数
+
+##### `req.query ` get接受处理好的参数
+
+post 接受处理好的请求`req.body`
 
 ```js
 app.use(express.json());
@@ -678,8 +723,8 @@ app.post("/baba",(req,res)=>{
 
 ### 脚手架
 
-全局安装express-generator
-express --view=ejs
+全局安装`express-generator`
+`express --view=ejs` 
 
 ```js
 npm i express-generator -g
@@ -693,8 +738,6 @@ node bin/www//启动项目
 express --no-view
 y
 ```
-
-
 
 ### Router拥有子路由
 
@@ -1330,10 +1373,10 @@ app.use(session({
 }
 ```
 
-### 上传图片multer包
+### 上传图片`multer`包
 
 在网页里面的上传文件
-要multer函数
+要`multer`函数
 
 ```js
 const multer = require("multer")
@@ -1366,12 +1409,35 @@ let upload = multer({
 let storage = multer.diskStorage({
     //存储位置目录
     destination:function(req,fill,cb){
-        cb(null,path)
+        cb(null,path)//path 是路径
     }
 })
 ```
 
-## svg-captcha
+## `formidable` 上传文件
+
+需要结合`http` 
+`const formidable = require('formidable')`
+
+```js
+const server = http.createServer((req,res)=>{
+  if(req.url === '/upload' && req.method.toLowerCase() === 'post'){//判断路由
+    const form = formidable({ multiples: true });//必须写
+
+    form.uploadDir = "./uploads"//上传的路径s
+
+    form.parse(req, (err, fields, files) => {
+        //这里上传成功
+      res.writeHead(200, {"Content-type":"text/plain"})
+      res.end(JSON.stringify({ fields, files }, null, 2));
+    });
+  }
+})
+```
+
+
+
+## `svg-captcha` 
 
 ### 登录验证码包
 
