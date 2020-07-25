@@ -742,30 +742,27 @@ methods:{
 使用get和set方法
 
 ```js
-fnuction foo(){
-    axios.get("地址")//如果要查询具体的数值后面加上问号在添加属性名,等号属性值
-    .then(function(response){
-        //请求数据成功的函数
-        console.log(response)
-        //response就是后端返回的数据
-    }),function(err){
-        //请求数据失败的函数
-    }
-}
+axios.get("地址")//如果要查询具体的数值后面加上问号在添加属性名,等号属性值
+    .then((response)=>{
+    //请求数据成功的函数
+    console.log(response)
+    //response就是后端返回的数据
+	})
+    .catch(err=>{
+    //请求数据失败的函数
+	})
 ```
 
 不同的地址获取的数据不同查询的方法不同
 如果是表单元素(post)要在地址后面加逗号,在用对象的方式输入数值
 
 ```js
-fnuction foo(){
     axios.post("地址",{username:"名称"})
-    .then(function(response){
+    .then((response)=>{
         //请求数据成功的函数
-    }),function(err){
+    }).catch((err)=>{
         //请求数据失败的函数
-    }
-}
+    })
 ```
 
 ### 组件里面调用
@@ -1517,10 +1514,6 @@ modules:{
 
 在导入数据的时候加上名字
 `mapState('num',['num'])`
-
-
-
-
 
 
 
