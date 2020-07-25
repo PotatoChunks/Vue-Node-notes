@@ -841,7 +841,7 @@ app.get("/",(req,res)=>{
 
 ```php+HTML
 <div>
-	<%= goudan%>
+	<%= goudan %>
 </div>
 ```
 
@@ -905,7 +905,7 @@ mongoose.connect("mongodb://localhost:27017/goudan",{useNewUrlParser:true,useUni
 //服务器里面也是localhost
 ```
 
-mongodb返回一个promise可以.then
+`mongodb`返回一个promise可以.then
 
 ```js
 mongoose
@@ -932,7 +932,7 @@ let userSchema = new Schema({
 });
 ```
 
-必须拥有这个属性在后方加上required:true
+必须拥有这个属性在后方加上`required:true`
 
 默认值default:"你要设置的默认值"
 
@@ -1476,5 +1476,39 @@ const crypto = require("crypto")
 crypto.createHash("sha256").update(pwd).digest("hex")//pwd是密码
 ```
 
+## 长轮询`WebScoket`
 
+### `ws` 
 
+导入`ws` 模块
+
+```js
+const webSocket = new ws.Server({port:3000})//监听端口
+```
+
+服务器建立响应
+
+```js
+webSocket.on('connection',(w)=>{
+  w.on('message',message=>{
+    console.log('客户端发送过来的数据'+message);
+    w.send("我接受到了信息-服务端")
+  })
+})
+```
+
+在前端使用`WebSocket` 
+
+```js
+let ws = new WebSocket('ws://localhost:3000')
+```
+
+open链接成功
+message向服务器接受和发送消息
+close链接关闭
+
+### `socket.IO` 
+
+下载这个模块之后自带一个`socket.io`客户端
+客户端引入`/socket.io/socket.io.js`
+全局暴露一个`io`属性
