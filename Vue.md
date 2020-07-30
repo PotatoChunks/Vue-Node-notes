@@ -1,3 +1,6 @@
+`Vue` 是基于`MVVM`设计模式
+是单页面应用
+
 ## 引入Vue代码
 
 ```html
@@ -160,12 +163,15 @@ let app=new Vue({
 
 ```js
 computed:{
-    get(){
+    msg:{
+        get(){
         return 2
+        }
+        ,set(){
+            this.lie ++
+        }
     }
-    ,set(){
-        this.lie ++
-    }
+    
 }
 ```
 
@@ -931,6 +937,22 @@ npm run sever
 npm run build
 ```
 
+#### 打包注意事项
+
+如果打包后放到路由的子路径
+需要注意
+在根目录创建`vue.config.js` 文件
+写上如下代码
+
+```js
+module.exports = {
+    publicPath:'./'
+}
+```
+
+如果安装了前端路由请参照
+https://www.cnblogs.com/zsg88/articles/12557862.html 进行更改
+
 ### 插槽
 
 在你的组件写上slot标签
@@ -1531,3 +1553,8 @@ watch:{
 
 
 
+
+
+
+
+​	
