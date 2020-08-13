@@ -1,3 +1,6 @@
+`Vue` 是基于`MVVM`设计模式
+是单页面应用
+
 ## 引入Vue代码
 
 ```html
@@ -160,12 +163,15 @@ let app=new Vue({
 
 ```js
 computed:{
-    get(){
+    msg:{
+        get(){
         return 2
+        }
+        ,set(){
+            this.lie ++
+        }
     }
-    ,set(){
-        this.lie ++
-    }
+    
 }
 ```
 
@@ -278,7 +284,7 @@ let app=new Vue({
 enter回车键
 
 ```html
-<div @keyup.k="方法"></div><!--按K键触发事件-->
+<div @keyup.k="方法($event)"></div><!--按K键触发事件-->
 ```
 
 可以串联修饰
@@ -477,10 +483,48 @@ Vue.directive("goudan",(node,data)=>{//节点,数据
 })
 ```
 
+```js
+//或者
+Vue.directive('dachui',{
+    bind(){
+        //指令第一次绑定时调用的函数
+    },
+    inserted(){
+        //当被绑定的元素插入DOM中时
+    },
+    update(){
+        //数据进行更改时
+    },
+    componentUpdate(){
+        //
+    },
+    upbind(){
+        //解绑
+    }
+})
+```
+
+
+
 标签里面添加v-goudan
 指令里面传一个名字和函数
 函数里面有两个参数
 绑定的节点 , 带来的数据
+
+### `extend` 构造器创建子类
+
+```js
+const goudan = Vue.extend({
+    template:'<div>{{name}}</div>',
+    data(){
+        return{
+            name:'dachui'
+        }
+    }
+})
+//挂载到#cuihua里
+new goudan().$mount('#cuihua')
+```
 
 ### Vue.set
 
@@ -518,7 +562,7 @@ this.$delete(this.arr,1)//删除下标是1的值
 this.arr.splice(1,1)
 ```
 
-### DOM更新之后进行操作nextTick
+### DOM更新之后进行操作`nextTick` 
 
 DOM进行更新之后进行操作
 但是你写在那个方法里面那个才触发
@@ -712,10 +756,19 @@ componente:{
 设置的自定义事件写在组件的标签上面
 
 ```html
+父组件里的子组件标签
 <aaa @goudan="fun"></aaa>fun在父组件里写函数 ,父组件函数接受值
 <script>
 methods:{
-    fun(){
+    fun(data){
+       //data就是传来的参数
+    }
+}
+</script>
+/*-------------下面是子组件里进行事件发射*/
+<script>
+methods:{
+    dachui(){
        this.$emit("goudan",this.msg)//自定义事件名 ,传过来的数据
     }
 }
@@ -730,6 +783,41 @@ methods:{
 
 在`Vue`实例里面使用`this.$refs`获取此节点
 如果在组件里使用`ref`那么`this.$refs`返回的是这个组件的实例方法
+
+### 依赖注入
+
+相当于组件的子组件传值个父组件
+
+```js
+Vue.component("goudan",{
+    template:"#goudan",
+    data(){
+        return{}
+    },
+    provide(){
+        //发送数据
+        return{
+            goudan:'11'
+        }
+    }
+})
+```
+
+```js
+Vue.component("dachui",{//另一个组件
+    template:"#dachui",
+    data(){
+        return{}
+    },
+    inject:['goudan']//接受
+})
+```
+
+耦合
+改的方法更麻烦一点
+数据传过来的是非响应式的
+
+
 
 ## Axios
 
@@ -835,10 +923,6 @@ export function goudan(){
 import {goudan} from '../../api';
 ```
 
-
-
-
-
 ## new vue
 
 new vue返回一个实例化后的东西
@@ -931,6 +1015,22 @@ npm run sever
 npm run build
 ```
 
+#### 打包注意事项
+
+如果打包后放到路由的子路径
+需要注意
+在根目录创建`vue.config.js` 文件
+写上如下代码
+
+```js
+module.exports = {
+    publicPath:'./'
+}
+```
+
+如果安装了前端路由请参照
+https://www.cnblogs.com/zsg88/articles/12557862.html 进行更改
+
 ### 插槽
 
 在你的组件写上slot标签
@@ -951,7 +1051,7 @@ npm run build
 <slot name="dachui"></slot>
 ```
 
-显示内容用template标签
+显示指定插槽内容用`template`标签
 
 #### v-slot/#
 
@@ -969,7 +1069,7 @@ npm run build
 可以用于传值
 
 ```html
-<slot :goudan="msg" :dachu="gg" name="goudan"></slot>
+<slot :goudan="msg" :dachu="gg" :name="goudan"></slot>
 /////////////////////////////////使用
 <template v-slot:goudan="{msg,gg}">
 	<p>我是第一段内容</p>
@@ -1013,9 +1113,13 @@ npm run build
 
 上面两个需要`keyy-alive`标签才会触发
 
-### beforeDestroy()组件消失
+### beforeDestroy()消失之前
 
-### destroyed()组件重新显示
+组件消失
+
+### destroyed()消失之后
+
+组件重新显示
 
 ## UI组件
 
@@ -1056,7 +1160,18 @@ history路由
 路径就没有#号
 但是他的路由容易跟后端冲突
 比如 前端有一个/adou路由  后端有一个/adou路由 一旦刷新页面就出错
-后端需要设置get路由返回一个文件
+后端需要设置get路由返回同一个`HTML`文件
+
+切换模式就是更改`router` 下面的`index`文件
+
+```js
+const router = new VueRouter({
+    mode:"history"//默认是hash路由 ,就是带#号的
+  	routes
+});
+
+export default router
+```
 
 ### 配置路由
 
@@ -1095,6 +1210,15 @@ this.$router.push("/")//添加一个当前的新历史 浏览记录
 this.$router.go(-1)//当前页面向前访问 正数是向后
 this.$router.replace("/")//替换当前浏览的记录
 ```
+
+#### `push` 的操作
+
+```js
+//可以传对象
+this.$router.push({path:'/foo1',query:{name:'goudan'}})//query是参数
+```
+
+
 
 ### 子路由children
 
@@ -1260,7 +1384,7 @@ data(){
     }
 }
 ,beforeRouterEnter(to,from,next){
-    next(vm={
+    next(vm=>{
         vm.msg++
     })
 }
@@ -1278,7 +1402,7 @@ data(){
     }
 }
 ,beforeRouterUpdate(to,from,next){
-    next(vm={
+    next(vm=>{
         vm.msg++
     })
 }
