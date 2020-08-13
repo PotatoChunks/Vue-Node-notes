@@ -24,6 +24,24 @@
 
 ### 方向键上下查看历史记录
 
+## 启动node项目
+
+```js
+node goudan.js
+```
+
+可以动态传入参数
+
+```js
+node goudan.js 你的参数
+```
+
+在文件里用`process.argv`获取值
+返回一个数组
+第一个为node系统路径
+第二个为文件路径
+后面为输入的控制台参数
+
 ## node的模块系统
 
 下载别人的`node`先用`npm start`
@@ -465,13 +483,15 @@ npm update 包名
 npm list
 ```
 
-全局后面加上  -g
+全局后面加上查看全局的包  -g
 
 ### 上传项目到`npm`服务器上
 
 ```js
-npm publish
+npm publish//发布到npm上
 ```
+
+可能要先登录`npm login`
 
 ## `node `爬虫
 
@@ -529,7 +549,7 @@ npm i cheerio -S
 
 ```js
 const {JSDOM} = require("jsdom")
-let document = new JSDOM("html代码").window
+let {document} = new JSDOM("html代码").window
 ```
 
 `jq`里的`dom`
@@ -691,6 +711,26 @@ app.use((req,res,next)=>{
     res.name = "布拉"
     next()
 })
+```
+
+## 后端允许跨域
+
+```js
+//允许所有域名跨域
+app.use((req,res,next)=>{
+  res.header({
+    'Access-Control-Allow-Credentials': true,
+    'Access-Control-Allow-Origin': req.headers.origin || '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
+    'Content-Type': 'application/json; charset=utf-8'
+  });
+  if (req.method === "OPTIONS"){
+    res.sendStatus(200);
+  }else{
+    next();
+  }
+});
 ```
 
 **不能给前端send多次**
@@ -1307,7 +1347,7 @@ user
 
 ```js
 //添加session中间件
-let app = express()
+const session = require("express-session");
 app.use(session({
     secret:"eee"//秘钥, 一个字符, 用于加密, 不用自己解密可以自己随便写
     ,cookie:{maxAge:10*60*1000}//给前端设置的cookie有效时间:10分钟
@@ -1330,6 +1370,20 @@ user.findOne({user:data.pwd})//data是数据库里的数据
 	})
 ```
 
+在跨平台开发的过程中存在跨域问题
+跨域是不准写带`cookie`的
+所以跨域请求需要携带一些参数
+比如`ajax`请求中携带一下参数
+
+```js
+$.ajax({
+    xhrFields:{withCredentials:true}
+})
+```
+
+不同的请求写不同的参数
+在客户端中的请求信息中加上了`withCredentials:true`,也就是在发起请求的时候要求它一定要带上cookie信息
+
 #### 将数据库session存到数据库里
 
 ```js
@@ -1350,7 +1404,7 @@ const sessionMong = require("connect-mongo")("session")
 
 ```js
 //添加session中间件
-let app = express()
+const session = require("express-session");
 app.use(session({
     secret:"eee"//秘钥, 一个字符, 用于加密, 不用自己解密可以自己随便写
     ,cookie:{maxAge:10*60*1000}//给前端设置的cookie有效时间:10分钟
@@ -1358,10 +1412,9 @@ app.use(session({
     ,resave:false //是否每次从新存储session
     ,saveUninitialized:false //初始化
 	,store:new sessionMong({//添加中间件
-        url:"mongdb://localhost:27017/test"//设置添加到的路径
+        url:"mongodb://localhost:27017/test"//设置添加到的路径
     })
 }))
-
 ```
 
 #### 删除session的状态
@@ -1391,6 +1444,7 @@ let upload = multer({
         fileSize:1024*1024//1Mb
     }
 }).single("file")//单个文件/图片
+//array("file",num);传多个文件,num是个数
 ```
 
 在数据里面
