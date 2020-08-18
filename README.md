@@ -23,6 +23,8 @@ el支持class(以点)、标签名方式
 
 ### 在标签里显示数据用双大括号
 
+`Mustache` 语法糖
+
 ```html
 <div class="#app">{{content}}</div>
 <script> new Vue({
@@ -1650,13 +1652,3 @@ watch:{
     }
 }
 ```
-
-
-
-
-
-
-
-
-
-​	
